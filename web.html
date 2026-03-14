@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Gracias</title>
+
+<style>
+body{
+  margin:0;
+  background:black;
+  overflow:hidden;
+}
+
+canvas{
+  display:block;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="c"></canvas>
+
+<script>
+
+const canvas = document.getElementById("c")
+const ctx = canvas.getContext("2d")
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+}
+
+resizeCanvas()
+window.addEventListener("resize", resizeCanvas)
+
+const particles = []
+
+const textCanvas = document.createElement("canvas")
+const textCtx = textCanvas.getContext("2d")
+
+textCanvas.width = window.innerWidth
+textCanvas.height = window.innerHeight
+
+textCtx.fillStyle = "white"
+
+let fontSize = Math.min(window.innerWidth * 0.08, 120)
+
+textCtx.font = "bold " + fontSize + "px sans-serif"
+textCtx.textAlign = "center"
+
+textCtx.fillText(
+ "gracias por enseñarme",
+ textCanvas.width/2,
+ textCanvas.height/2
+)
+
+const data = textCtx.getImageData(
+ 0,
+ 0,
+ textCanvas.width,
+ textCanvas.height
+).data
+
+for(let y=0;y<textCanvas.height;y+=6){
+  for(let x=0;x<textCanvas.width;x+=6){
+
+    const index=(y*textCanvas.width+x)*4
+
+    if(data[index+3]>128){
+      particles.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        tx:x,
+        ty:y
+      })
+    }
+
+  }
+}
+
+function animate(){
+
+  ctx.fillStyle="black"
+  ctx.fillRect(0,0,canvas.width,canvas.height)
+
+  ctx.fillStyle="white"
+
+  particles.forEach(p=>{
+    p.x += (p.tx-p.x)*0.03
+    p.y += (p.ty-p.y)*0.03
+
+    ctx.beginPath()
+    ctx.arc(p.x,p.y,2,0,Math.PI*2)
+    ctx.fill()
+  })
+
+  requestAnimationFrame(animate)
+}
+
+animate()
+
+</script>
+
+</body>
+</html>
